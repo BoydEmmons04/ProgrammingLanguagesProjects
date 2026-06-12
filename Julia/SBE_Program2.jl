@@ -1,49 +1,66 @@
-# TODO: Add comment block with details
 
 using Printf, Statistics
 
 struct Student
-    firstname::String
-    lastname::String
-    homework::Vector{Int}
-    tests::Vector{Int}
+    first_name::String
+    last_name::String
+    homework_scores::Vector{Int}
+    test_scores::Vector{Int}
 end
 
 function main()
-    filename, testweight, homeworkweight, _, _ = getuserinput()
+    filename, test_weight, homework_weight, _, _ = get_user_input()
 
-    students = readfile(filename)
+    students = read_file(filename)
 
-    sortstudents!(students)
+    sorted_students_name = sort_students_by_name(students)
+    grade_sorted_students = sort_students_by_grade(students, test_weight, homework_weight)
 
-    maxhomework = 0
-    maxtests = 0
+    max_homework = 0
+    max_tests = 0
 
     for student in students 
-        if length(student.homework) > maxhomework
-            maxhomework = length(student.homework)
+        if length(student.homework_scores) > max_homework
+            max_homework = length(student.homework_scores)
         end
-        if length(student.tests) > maxtests
-            maxtests = length(student.tests)
+        if length(student.test_scores) > max_tests
+            max_tests = length(student.test_scores)
         end
     end
 
-    classtestavg, classhomeworkavg, classavg = calculateclassaverages(students, testweight, homeworkweight)
+    class_test_avg, class_homework_avg, class_avg = calculate_class_averages(students, test_weight, homework_weight)
 
-    printreport(
-        students,
-        testweight,
-        homeworkweight,
-        classtestavg,
-        classhomeworkavg,
-        classavg,
-        maxhomework,
-        maxtests
+    print_report_header(
+        sorted_students_name,
+        test_weight,
+        homework_weight,
+        class_test_avg,
+        class_homework_avg,
+        class_avg
     )
     
+    println("\n\nNAME-SORTED REPORT\n")
+    print_report_table(
+        sorted_students_name,
+        test_weight,
+        homework_weight,
+        max_homework,
+        max_tests
+    )
+
+    println("\n\nGRADE-SORTED REPORT\n")
+    print_report_table(
+        grade_sorted_students,
+        test_weight,
+        homework_weight,
+        max_homework,
+        max_tests
+    )
+
+    println("End of Program 2")
 end
 
-function getuserinput()
+function get_user_input()
     print("""Welcome to the gradebook calculator test program. I am going to
 		read students from an input data file. You will tell me the name of
 		your input file.\n\n""")
@@ -52,108 +69,122 @@ function getuserinput()
     filename = readline()
     
     print("Enter the % amount to weight test in overall avg: ")
-    testweightstring = readline()
-    testweight = parse(Float64, testweightstring)
-    homeworkweight = 100.0 - testweight
+    test_weight_string = readline()
+    test_weight = parse(Float64, test_weight_string)
+    homework_weight = 100.0 - test_weight
 
-    @printf("Tests will be weighted %.1f%%, Homework weighted %.1f%% \n\n", testweight, homeworkweight)
+    @printf("Tests will be weighted %.1f%%, Homework weighted %.1f%% \n\n", test_weight, homework_weight)
 
     print("How many homework assignments are there? ")
-    numhomework = readline()
+    num_homework = readline()
 
     print("How many test grades are there? ")
-    numtests = readline()
+    num_tests = readline()
 
-    return filename, testweight, homeworkweight, numhomework, numtests
+    return filename, test_weight, homework_weight, num_homework, num_tests
 end
 
-function readfile(filename) 
+function read_file(filename) 
     students = Student[]
 
     open(filename, "r") do file
         while !eof(file)
-            nameline = strip(readline(file))
+            name_line = strip(readline(file))
 
-            if isempty(nameline)
+            if isempty(name_line)
                 continue
             end
 
-            nameparts = split(nameline)
+            name_parts = split(name_line)
 
-            if length(nameparts) < 2
-                println("Invalid name line: $nameline")
+            if length(name_parts) < 2
+                println("Invalid name line: $name_line")
                 continue
             end
 
-            firstname = nameparts[1] # julia arrays start at 1
-            lastname = nameparts[2]
+            first_name = name_parts[1] # julia arrays start at 1
+            last_name = name_parts[2]
 
             if eof(file)
-                println("Missing test line for $nameline")
+                println("Missing test line for $name_line")
                 break
             end
-            tests = parsescores(readline(file))
+            test_scores = parse_scores(readline(file))
 
             if eof(file)
-                println("Missing homework line for $nameline")
+                println("Missing homework line for $name_line")
                 break
             end
-            homework = parsescores(readline(file))
+            homework_scores = parse_scores(readline(file))
 
-            push!(students, Student(firstname, lastname, homework, tests))
+            push!(students, Student(first_name, last_name, homework_scores, test_scores))
         end
     end
     return students
 end
 
-function sortstudents!(students) # The ! means that the function modifies an argument
-    sort!(students, by = s -> (lowercase(s.lastname), lowercase(s.firstname)))
+function sort_students_by_name(students)
+    return sort(students, by = s -> (lowercase(s.last_name), lowercase(s.first_name)))
 end
 
-function calculateclassaverages(students, testweight, homeworkweight)
-    classtestavg = 0.0
-    classhomeworkavg = 0.0
-    classoverallavg = 0.0
+function sort_students_by_grade(students, test_weight, homework_weight)
+    return sort(students, by = s -> begin
+        test_avg = mean(s.test_scores)
+        hw_avg = mean(s.homework_scores)
+        -(hw_avg*(homework_weight/100.0) + test_avg*(test_weight/100.0))
+    end)
+end
+
+function calculate_class_averages(students, test_weight, homework_weight)
+    class_test_avg = 0.0
+    class_homework_avg = 0.0
+    class_overall_avg = 0.0
 
     for student in students
-        testavg = mean(student.tests)
-        homeworkavg = mean(student.homework)
+        test_avg = mean(student.test_scores)
+        homework_avg = mean(student.homework_scores)
 
-        classtestavg += testavg
-        classhomeworkavg += homeworkavg
+        class_test_avg += test_avg
+        class_homework_avg += homework_avg
 
-        classoverallavg += testavg*(testweight/100.0) + homeworkavg*(homeworkweight/100.0)
+        class_overall_avg += test_avg*(test_weight/100.0) + homework_avg*(homework_weight/100.0)
     end
 
     if length(students) > 0
         count = length(students)
         
-        classtestavg /= count
-        classhomeworkavg /= count
-        classoverallavg /= count
+        class_test_avg /= count
+        class_homework_avg /= count
+        class_overall_avg /= count
     end
 
-    return classtestavg, classhomeworkavg, classoverallavg
+    return class_test_avg, class_homework_avg, class_overall_avg
 end
 
-function printreport(
-    students, 
-    testweight, 
-    homeworkweight, 
-    classtestavg, 
-    classhomeworkavg, 
-    classavg, 
-    maxhomework, 
-    maxtests
+function print_report_header(
+    sorted_students_name, 
+    test_weight, 
+    homework_weight, 
+    class_test_avg, 
+    class_homework_avg, 
+    class_avg
     )
     println()
-    @printf("GRADE REPORT --- %d STUDENTS FOUND IN FILE\n", length(students))
-    @printf("TEST WEIGHT: %.1f%%\n", testweight)
-    @printf("HOMEWORK WEIGHT: %.1f%%\n", homeworkweight)
-    @printf("CLASS TEST AVERAGE: %.1f\n", classtestavg)
-    @printf("CLASS HOMEWORK AVERAGE: %.1f\n", classhomeworkavg)
-    @printf("OVERALL AVERAGE is %.1f\n\n", classavg)
+    @printf("GRADE REPORT --- %d STUDENTS FOUND IN FILE\n", length(sorted_students_name))
+    @printf("TEST WEIGHT: %.1f%%\n", test_weight)
+    @printf("HOMEWORK WEIGHT: %.1f%%\n", homework_weight)
+    @printf("CLASS TEST AVERAGE: %.1f\n", class_test_avg)
+    @printf("CLASS HOMEWORK AVERAGE: %.1f\n", class_homework_avg)
+    @printf("OVERALL AVERAGE is %.1f\n\n", class_avg)
+end
 
+function print_report_table(
+    sorted_students, 
+    test_weight, 
+    homework_weight, 
+    max_homework, 
+    max_tests
+    )
     @printf("%-20s : %8s %5s %12s %5s %10s\n",
         "STUDENT NAME",
         "TESTS",
@@ -164,25 +195,25 @@ function printreport(
 
     println("---------------------------------------------------------------------")
 
-    for student in students
-        hwavg = mean(student.homework)
-        testavg = mean(student.tests)
+    for student in sorted_students
+        hw_avg = mean(student.homework_scores)
+        test_avg = mean(student.test_scores)
 
-        total = hwavg * (homeworkweight / 100.0) + testavg * (testweight / 100.0)
-        name = "$(student.lastname), $(student.firstname)"
+        total_avg = hw_avg * (homework_weight / 100.0) + test_avg * (test_weight / 100.0)
+        display_name = "$(student.last_name), $(student.first_name)"
 
         @printf("%-20s : %8.1f %5s %12.1f %5s %10.1f",
-            name,
-            testavg,
-            "($(length(student.tests)))",
-            hwavg,
-            "($(length(student.homework)))",
-            total)
+            display_name,
+            test_avg,
+            "($(length(student.test_scores)))",
+            hw_avg,
+            "($(length(student.homework_scores)))",
+            total_avg)
 
-        if length(student.homework) < maxhomework
+        if length(student.homework_scores) < max_homework
             print(" ** may be missing a homework **")
         end
-        if length(student.tests) < maxtests
+        if length(student.test_scores) < max_tests
             print(" ** may be missing a test **")
         end
 
@@ -190,11 +221,10 @@ function printreport(
     end
 
     println("---------------------------------------------------------------------")
-    println("\nEnd of Program 1")
 
 end
 
-function parsescores(line)
+function parse_scores(line)
     return parse.(Int, split(line))
 end
 
