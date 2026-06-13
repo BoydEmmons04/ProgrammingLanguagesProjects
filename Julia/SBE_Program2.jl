@@ -1,6 +1,7 @@
 
 using Printf, Statistics
 
+# Student struct used for storing information for each student
 struct Student
     first_name::String
     last_name::String
@@ -8,6 +9,23 @@ struct Student
     test_scores::Vector{Int}
 end
 
+"""
+main()
+
+Control the flow of the program. Call helper functions to gather input, compute, and output in a formatted report.
+
+Arguments
+---------
+None
+
+Returns
+-------
+Nothing
+
+Example
+-------
+julia> main()
+"""
 function main()
     filename, test_weight, homework_weight, _, _ = get_user_input()
 
@@ -60,6 +78,24 @@ function main()
     println("End of Program 2")
 end
 
+"""
+get_user_input()
+
+Prompts the user for filename, weight, and hw/test grades
+
+Arguments
+---------
+None
+
+Returns
+-------
+filename, test_weight, homework_weight, num_homework, num_tests
+
+Example
+-------
+julia> filename, test_weight, homework_weight, num_homework, num_tests = get_user_input()
+"""
+
 function get_user_input()
     print("""Welcome to the gradebook calculator test program. I am going to
 		read students from an input data file. You will tell me the name of
@@ -83,6 +119,24 @@ function get_user_input()
 
     return filename, test_weight, homework_weight, num_homework, num_tests
 end
+
+"""
+read_file(filename)
+
+Opens the user specified file and extracts useful information into an array of Student objects
+
+Arguments
+---------
+filename
+
+Returns
+-------
+students[]
+
+Example
+-------
+julia> students = read_file(filename)
+"""
 
 function read_file(filename) 
     students = Student[]
