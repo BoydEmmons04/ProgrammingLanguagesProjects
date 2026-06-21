@@ -1,7 +1,33 @@
+"""
+Name: Boyd Emmons
+Program Name: SBE_Program2.jl
+Class: CS 424 Summer 2026
+Assignment 2: Gradebook Calculator in Julia
+Testing Environment:
 
+	
+
+Commands: 
+
+This assignment was much easier than the first one. Most of the time spent on this project was just looking at
+conversions between Go and Julia code. The Julia documentation was used to convert the code and used to reference
+best practice for naming and comment structure. The explaination of the program is mostly the same from the last
+assignment
+
+This program reads student information from a user specified file and calculates test_scores, homework_scores, and
+class_overall_avg based on the user provided test_weight and homework_weight. It also calculates class_test_avg,
+class_homework_avg, and counts the number of students read from filename. The program also handles missing grades
+and homework by outputting a warning message next to the student's grade information. The code uses an array of
+Student structs named students to hold the class information. Functions created for this project include main,
+get_user_input, read_file, sort_students_by_name, sort_students_by_grade, calculate_class_averages,
+print_report_header, print_report_table, and parse_scores. Error handling was largely ignored due to the
+instructions explicitly stating that all input would be properly formatted.
+"""
+
+# Include statements. Only used printf and statistics
 using Printf, Statistics
 
-# Student struct used for storing information for each student
+# Student struct used to store student information
 struct Student
     first_name::String
     last_name::String
@@ -22,9 +48,6 @@ Returns
 -------
 Nothing
 
-Example
--------
-julia> main()
 """
 function main()
     filename, test_weight, homework_weight, _, _ = get_user_input()
@@ -79,7 +102,7 @@ function main()
 end
 
 """
-get_user_input()
+get_user_input(filename, test_weight, homework_weight, num_homework, num_tests)
 
 Prompts the user for filename, weight, and hw/test grades
 
@@ -91,11 +114,7 @@ Returns
 -------
 filename, test_weight, homework_weight, num_homework, num_tests
 
-Example
--------
-julia> filename, test_weight, homework_weight, num_homework, num_tests = get_user_input()
 """
-
 function get_user_input()
     print("""Welcome to the gradebook calculator test program. I am going to
 		read students from an input data file. You will tell me the name of
@@ -133,11 +152,7 @@ Returns
 -------
 students[]
 
-Example
--------
-julia> students = read_file(filename)
 """
-
 function read_file(filename) 
     students = Student[]
 
@@ -177,10 +192,38 @@ function read_file(filename)
     return students
 end
 
+"""
+sort_students_by_name(students[])
+
+Uses the built in sort function to return the students array sorted by last and first name
+
+Arguments
+---------
+students[]
+
+Returns
+-------
+students[]
+
+"""
 function sort_students_by_name(students)
     return sort(students, by = s -> (lowercase(s.last_name), lowercase(s.first_name)))
 end
 
+"""
+sort_students_by_grade(students[])
+
+Uses the built in sort function to return the students array sorted by total average
+
+Arguments
+---------
+students[]
+
+Returns
+-------
+students[]
+
+"""
 function sort_students_by_grade(students, test_weight, homework_weight)
     return sort(students, by = s -> begin
         test_avg = mean(s.test_scores)
@@ -189,6 +232,20 @@ function sort_students_by_grade(students, test_weight, homework_weight)
     end)
 end
 
+"""
+calculate_class_averages(students[], test_weight, homework_weight)
+
+Calculates the class test, homework, and overall averages using the weights and students array
+
+Arguments
+---------
+students[], test_weight, homework_weight
+
+Returns
+-------
+class_test_avg, class_homework_avg, class_overall_avg
+
+"""
 function calculate_class_averages(students, test_weight, homework_weight)
     class_test_avg = 0.0
     class_homework_avg = 0.0
@@ -215,6 +272,20 @@ function calculate_class_averages(students, test_weight, homework_weight)
     return class_test_avg, class_homework_avg, class_overall_avg
 end
 
+"""
+print_report_header(sorted_students_name, test_weight, homework_weight, class_test_avg, class_homework_avg, class_avg)
+
+Prints the report header with the number of students, test weight, homework weight, and class averages
+
+Arguments
+---------
+sorted_students_name[], test_weight, homework_weight, class_test_avg, class_homework_avg, class_avg
+
+Returns
+-------
+None
+
+"""
 function print_report_header(
     sorted_students_name, 
     test_weight, 
@@ -232,6 +303,20 @@ function print_report_header(
     @printf("OVERALL AVERAGE is %.1f\n\n", class_avg)
 end
 
+"""
+print_report_table(sorted_students[], test_weight, homework_weight, max_homework, max_tests)
+
+Prints the sorted table part of the grade report including the student name, test avg, hw avg, and total average
+
+Arguments
+---------
+sorted_students[], test_weight, homework_weight, max_homework, max_tests
+
+Returns
+-------
+None
+
+"""
 function print_report_table(
     sorted_students, 
     test_weight, 
@@ -278,8 +363,23 @@ function print_report_table(
 
 end
 
+"""
+parse_scores(line)
+
+Returns a parsed list of student scores
+
+Arguments
+---------
+line
+
+Returns
+-------
+parsed array of Ints
+
+"""
 function parse_scores(line)
     return parse.(Int, split(line))
 end
 
+# Call the main function in the file
 main()
