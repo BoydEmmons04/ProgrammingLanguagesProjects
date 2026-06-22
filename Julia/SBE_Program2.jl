@@ -4,10 +4,11 @@ Program Name: SBE_Program2.jl
 Class: CS 424 Summer 2026
 Assignment 2: Gradebook Calculator in Julia
 Testing Environment:
-
-	
+    Julia 1.12.6 Arch Linux
+	Julia 1.12.6 Windows 10 Home
 
 Commands: 
+    julia SBE_Program2.jl
 
 This assignment was much easier than the first one. Most of the time spent on this project was just looking at
 conversions between Go and Julia code. The Julia documentation was used to convert the code and used to reference
