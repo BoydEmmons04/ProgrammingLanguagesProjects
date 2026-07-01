@@ -31,7 +31,7 @@ disjoint([H|T], L2) :- \+ member(H, L2), disjoint(T, L2).
 %   @param Count The number of occurrences of Value in List.
 
 % Base case: empty list has 0 occurrences of any value
-countValues(X, [], 0). 
+countValues(_, [], 0). 
 
 % If the first value is the one were looking for add 1 and recurse
 countValues(X, [X|T], N) :- countValues(X, T, N1), N is N1 + 1.
@@ -49,12 +49,16 @@ countValues(X, [H|T], N) :- X \= H, countValues(X, T, N).
 % Base case
 letter(0, 0).
 
+% ==============
+% TODO: validate input is number
+% ==============
+
 % Return A if score is >= 90 and <= 100
-letter(Score, A) :- Score >= 90, Score <= 100.
-letter(Score, B) :- Score >= 80, Score <= 89.
-letter(Score, C) :- Score >= 70, Score <= 79.
-letter(Score, D) :- Score >= 65, Score <= 69.
-letter(Score, F) :- Score >= 0, Score <= 64.
+letter(Score, 'A') :- Score >= 90, Score =< 100.
+letter(Score, 'B') :- Score >= 80, Score < 90.
+letter(Score, 'C') :- Score >= 70, Score < 80.
+letter(Score, 'D') :- Score >= 65, Score < 70.
+letter(Score, 'F') :- Score >= 0, Score < 65.
 
 % Catch all other values
 letter(_, unknown_grade_value).
