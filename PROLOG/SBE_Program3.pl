@@ -46,19 +46,15 @@ countValues(X, [H|T], N) :- X \= H, countValues(X, T, N).
 %   @param Score The numeric score to convert.
 %   @param Letter The corresponding letter grade.
 
-% Base case
-letter(0, 0).
+% Validate input and range before converting
+letter(Score, Grade) :- number(Score), Score >= 0, Score =< 100, letterGrade(Score, Grade).
 
-% ==============
-% TODO: validate input is number
-% ==============
-
-% Return A if score is >= 90 and <= 100
-letter(Score, 'A') :- Score >= 90, Score =< 100.
-letter(Score, 'B') :- Score >= 80, Score < 90.
-letter(Score, 'C') :- Score >= 70, Score < 80.
-letter(Score, 'D') :- Score >= 65, Score < 70.
-letter(Score, 'F') :- Score >= 0, Score < 65.
+% Return proper letter grade 
+letterGrade(Score, a) :- Score >= 90, Score =< 100.
+letterGrade(Score, b) :- Score >= 80, Score < 90.
+letterGrade(Score, c) :- Score >= 70, Score < 80.
+letterGrade(Score, d) :- Score >= 65, Score < 70.
+letterGrade(Score, f) :- Score >= 0, Score < 65.
 
 % Catch all other values
 letter(_, unknown_grade_value).
