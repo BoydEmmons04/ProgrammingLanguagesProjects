@@ -1,8 +1,6 @@
 %!  SBE_Program3.pl
 %   @author Boyd Emmons <sbe0007@uah.edu>
 %   @date 2026-07-01
-%   @copyright 2026, Boyd Emmons
-%   @license MIT
 %   @version 1.0
 %   @description The SBE_Program3.pl module defines rules for
 %   determining if two lists are disjoint, counting occurrences
