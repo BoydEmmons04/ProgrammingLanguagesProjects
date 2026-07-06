@@ -50,12 +50,12 @@ countValues(X, [H|T], N) :- X \= H, countValues(X, T, N).
 % Validate input and range before converting
 letter(Score, Grade) :- number(Score), Score >= 0, Score =< 100, letterGrade(Score, Grade).
 
+% Catch all other values
+letter(_, unknown_grade_value).
+
 % Return proper letter grade 
 letterGrade(Score, a) :- Score >= 90, Score =< 100.
 letterGrade(Score, b) :- Score >= 80, Score < 90.
 letterGrade(Score, c) :- Score >= 70, Score < 80.
 letterGrade(Score, d) :- Score >= 65, Score < 70.
 letterGrade(Score, f) :- Score >= 0, Score < 65.
-
-% Catch all other values
-letter(_, unknown_grade_value).
