@@ -7,6 +7,7 @@
 %   @description The SBE_Program3.pl module defines rules for
 %   determining if two lists are disjoint, counting occurrences
 %   of a value, and converting numeric grades to letter equivalents.
+%   these are defined as disjoint(), countValues(), and letter() respectively.
 
 %!  disjoint(+List1:list, +List2:list) is semidet.
 %
